@@ -1,0 +1,61 @@
+services:
+  servico-usuarios:
+    build:
+      context: ./servico-usuarios
+      dockerfile: Dockerfile
+    container_name: servico-usuarios
+    networks:
+      - desafio5-network
+    expose:
+      - "5001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/users/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  servico-pedidos:
+    build:
+      context: ./servico-pedidos
+      dockerfile: Dockerfile
+    container_name: servico-pedidos
+    networks:
+      - desafio5-network
+    expose:
+      - "5002"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/orders/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    networks:
+      - desafio5-network
+    ports:
+      - "8080:8080"
+    depends_on:
+      servico-usuarios:
+        condition: service_healthy
+      servico-pedidos:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+networks:
+  desafio5-network:
+    driver: bridge
+    name: desafio5-network

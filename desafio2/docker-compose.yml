@@ -1,0 +1,29 @@
+services:
+  app-popular:
+    build:
+      context: ./aplicacao
+      dockerfile: Dockerfile
+    container_name: app-popular
+    volumes:
+      - dados_sqlite:/data
+    command: python popular.py
+
+  app-ler:
+    build:
+      context: ./aplicacao
+      dockerfile: Dockerfile
+    container_name: app-ler
+    volumes:
+      - dados_sqlite:/data
+    command: python ler.py
+    profiles:
+      - leitura
+
+volumes:
+  dados_sqlite:
+    name: desafio2_dados_sqlite
+
+networks:
+  desafio2-network:
+    driver: bridge
+    name: desafio2-network

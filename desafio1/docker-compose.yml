@@ -1,0 +1,27 @@
+services:
+  servidor-web:
+    build:
+      context: ./servidor-web
+      dockerfile: Dockerfile
+    container_name: servidor-web
+    networks:
+      - desafio1-network
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  cliente:
+    build:
+      context: ./cliente
+      dockerfile: Dockerfile
+    container_name: cliente
+    networks:
+      - desafio1-network
+    depends_on:
+      - servidor-web
+    restart: unless-stopped
+
+networks:
+  desafio1-network:
+    driver: bridge
+    name: desafio1-network

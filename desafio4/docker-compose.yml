@@ -1,0 +1,44 @@
+services:
+  servico-usuarios:
+    build:
+      context: ./servico-usuarios
+      dockerfile: Dockerfile
+    container_name: servico-usuarios
+    networks:
+      - desafio4-network
+    ports:
+      - "5001:5001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  servico-agregador:
+    build:
+      context: ./servico-agregador
+      dockerfile: Dockerfile
+    container_name: servico-agregador
+    networks:
+      - desafio4-network
+    ports:
+      - "5002:5002"
+    environment:
+      USERS_SERVICE_URL: http://servico-usuarios:5001
+    depends_on:
+      servico-usuarios:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+networks:
+  desafio4-network:
+    driver: bridge
+    name: desafio4-network
