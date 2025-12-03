@@ -369,3 +369,8 @@ docker compose down -v
 docker volume rm desafio2_dados_sqlite
 docker compose up --build app-popular
 ```
+
+## Prints
+
+![Populando o banco](image.png)
+![Provando persistencia após derrubar o container](image-1.png)
